@@ -1,59 +1,50 @@
-# EonsStoreNg
+# EonsApi — ASP.NET Core Web API (migration step 2/4)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.32.
+Covers: **Auth** (`auth.php`) and **Products** (`products.php`) — one-to-one behavioural
+port, verified against the original PHP line by line.
 
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Run it
 
 ```bash
-ng generate component component-name
+cd EonsApi
+dotnet restore
+dotnet run
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Before running, edit `appsettings.json` → `ConnectionStrings:Default` to point at the
+database you created with `schema.mssql.sql` (same DB name you used in SSMS).
+
+API comes up on `https://localhost:5001` (or check the console output for the exact port).
+
+## Test it
 
 ```bash
-ng generate --help
+# public — should return the 35 seeded products
+curl http://localhost:5001/api/products
+
+# staff login — default seeded passcode is "eons" (change it after first login)
+curl -c cookies.txt -X POST http://localhost:5001/api/auth \
+  -H "Content-Type: application/json" -d "{\"passcode\":\"eons\"}"
+
+# staff-only: create a product (cookie from previous step required)
+curl -b cookies.txt -X POST http://localhost:5001/api/products \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"Test Item\",\"cat\":\"Peripherals\",\"sub\":\"Monitors\",\"desc\":\"test\",\"price\":1000,\"old\":0,\"stock\":5}"
 ```
 
-## Building
+## What's intentionally not here yet (next steps)
 
-To build the project run:
+- Orders / OrderItems (transaction + row-locked stock + status pipeline)
+- Categories / Subcategories, Coupons, DeliveryZones, Banners, Settings CRUD endpoint
+- `/api/bootstrap` combined endpoint (mirrors `bootstrap.php`)
 
-```bash
-ng build
-```
+Each of those follows the exact same pattern used here: entity in `Models/`, mapping in
+`AppDbContext.OnModelCreating`, DTO in `Dtos/` with field names matching the current
+frontend JSON exactly, controller replicating the PHP file's branches one for one.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Note on this build
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+This project was hand-written directly from `api/*.php`, not scaffolded — the sandbox
+this was generated in doesn't have NuGet access, so `dotnet restore`/`build` could not be
+run here to compile-check it. Please run `dotnet build` on your machine as the first
+step and report back any compile errors so they can be fixed immediately.
