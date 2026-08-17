@@ -1,0 +1,64 @@
+/* Copied from the original .cat-tiles-wrap/.cat-tile rules, sizes bumped up
+   per your request (was 84px circles / 96px tiles). */
+.cat-tiles-wrap { max-width: 1160px; margin: 34px auto 0; padding: 0 22px; }
+
+.cat-tiles {
+  display: flex;
+  gap: 14px 30px;
+  overflow-x: auto;
+  padding: 6px 2px 12px;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.cat-tile {
+  flex: none;
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+
+  @media (max-width: 640px) { width: 100px; }
+}
+
+.ct-img {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  background: var(--card);
+  border: 2px solid var(--line);
+  transition: .25s;
+
+  @media (max-width: 640px) { width: 88px; height: 88px; }
+}
+
+.cat-tile:hover .ct-img { border-color: var(--blue); transform: translateY(-4px); }
+.cat-tile.on .ct-img { border-color: var(--blue-deep); box-shadow: 0 0 0 3px rgba(42, 85, 162, .15); }
+
+.ct-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .25s ease; }
+.cat-tile:hover .ct-img img { transform: scale(1.07); }
+
+.ct-ph { width: 100%; height: 100%; display: grid; place-items: center; color: var(--blue-deep); }
+
+/* Real SVG icon — scales exactly via width/height, no emoji-font quirks */
+.ct-ph svg { width: 42px; height: 42px; }
+@media (max-width: 640px) { .ct-ph svg { width: 34px; height: 34px; } }
+
+.ct-letter { font-family: "Space Grotesk", sans-serif; font-size: 2.2rem; font-weight: 600; }
+
+.cat-tile span {
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  transition: color .2s;
+  width: 100%;
+  white-space: normal;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.cat-tile:hover span, .cat-tile.on span { color: var(--blue-deep); }

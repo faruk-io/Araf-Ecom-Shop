@@ -1,0 +1,18 @@
+<section class="staff-login">
+  <h2>Staff sign-in</h2>
+  <form (submit)="$event.preventDefault(); submit()">
+    <label>
+      Passcode
+      <input
+        type="password"
+        autofocus
+        [value]="passcode()"
+        (input)="passcode.set($any($event.target).value)"
+      />
+    </label>
+    @if (error()) { <p class="error">{{ error() }}</p> }
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Signing in…' : 'Sign in' }}
+    </button>
+  </form>
+</section>

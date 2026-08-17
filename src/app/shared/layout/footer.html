@@ -1,0 +1,42 @@
+<footer>
+  <div class="foot-inner">
+    <div>
+      <h4 class="foot-logo"><img src="assets/logo.png" alt="EONS" /></h4>
+      <p>{{ store.info()?.tagline }}</p>
+      @if (store.info()?.social_fb || store.info()?.social_ig || store.info()?.social_yt || store.info()?.social_tt) {
+        <div class="social-row">
+          @if (store.info()?.social_fb) { <a [href]="store.info()!.social_fb" target="_blank" rel="noopener">Facebook</a> }
+          @if (store.info()?.social_ig) { <a [href]="store.info()!.social_ig" target="_blank" rel="noopener">Instagram</a> }
+          @if (store.info()?.social_yt) { <a [href]="store.info()!.social_yt" target="_blank" rel="noopener">YouTube</a> }
+          @if (store.info()?.social_tt) { <a [href]="store.info()!.social_tt" target="_blank" rel="noopener">TikTok</a> }
+        </div>
+      }
+    </div>
+    <div>
+      <h4>Shop</h4>
+      @for (c of cats.menu(); track c.name) {
+        <a (click)="filterCat(c.name)">{{ c.name }}</a><br />
+      }
+      <a routerLink="/track" class="track-link">Track your order →</a>
+    </div>
+    <div>
+      <h4>Information</h4>
+      <div class="foot-links">
+        <a [routerLink]="['/page', 'about']">About Us</a>
+        <a [routerLink]="['/page', 'delivery']">Delivery Rules</a>
+        <a [routerLink]="['/page', 'return']">Return Policy</a>
+        <a [routerLink]="['/page', 'terms']">Terms &amp; Conditions</a>
+      </div>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <p>
+        @if (store.info()?.store_addr) { {{ store.info()!.store_addr }}<br /> }
+        WhatsApp: {{ store.info()?.whatsapp }}<br />
+        @if (store.info()?.email) { Email: <a [href]="'mailto:' + store.info()!.email">{{ store.info()!.email }}</a><br /> }
+        {{ store.info()?.hours }}
+      </p>
+    </div>
+  </div>
+  <div class="foot-bottom">© {{ currentYear }} {{ store.info()?.store_name || 'EONS Solutions' }}. All rights reserved.</div>
+</footer>

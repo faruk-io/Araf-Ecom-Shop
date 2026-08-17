@@ -1,0 +1,50 @@
+/* Copied from the original .float-contact rules (v5.1.1 redesign). */
+.float-contact {
+  position: fixed;
+  right: 18px;
+  bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 50;
+
+  @media (max-width: 640px) { bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
+
+.float-contact a {
+  position: relative;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+  border: 2px solid #fff;
+  transition: .2s;
+  color: #fff;
+
+  &:hover { transform: translateY(-3px) scale(1.05); }
+  .ico { width: 24px; height: 24px; }
+}
+
+.float-wa { background: #25d366 !important; &:hover { background: #1fbe5a !important; } }
+.float-call { background: var(--blue-deep) !important; &:hover { background: var(--ink) !important; } }
+
+@media (min-width: 821px) {
+  .float-contact a::before {
+    content: attr(data-label);
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) translateX(6px);
+    background: var(--ink);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: .8rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: .2s;
+  }
+  .float-contact a:hover::before { opacity: 1; transform: translateY(-50%) translateX(0); }
+}

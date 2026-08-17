@@ -1,0 +1,32 @@
+/* Global design tokens — copied 1:1 from the original index.html's :root{}
+   so the Angular port matches the live site's look exactly, not a generic
+   default theme. */
+:root {
+  --ink: #181f3b;
+  --ink-soft: #4e5570;
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --line: #dde3f0;
+  --blue: #4469af;
+  --blue-deep: #2a55a2;
+  --amber: #e8842c;
+  --teal: #2a7f95;
+  --shadow: 0 1px 2px rgba(24, 31, 59, .05), 0 8px 28px rgba(24, 31, 59, .08);
+  --r: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .serif { font-family: "Space Grotesk", "Segoe UI", sans-serif; }
+img { max-width: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+a { color: inherit; text-decoration: none; }

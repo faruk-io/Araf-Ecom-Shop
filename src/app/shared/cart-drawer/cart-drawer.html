@@ -1,0 +1,143 @@
+@if (cart.isOpen()) {
+  <div class="drawer-backdrop" (click)="closeAll()"></div>
+  <div class="drawer" [class.centered]="step() === 'checkout'">
+
+    @if (step() === 'bag') {
+      <div class="drawer-head">
+        <h2>Your bag</h2>
+        <button class="close-x" (click)="closeAll()" aria-label="Close">×</button>
+      </div>
+
+      @if (cart.items().length === 0) {
+        <div class="empty-bag">
+          <p>Your bag is empty.</p>
+          <button class="link-btn" (click)="closeAll()">Continue shopping</button>
+        </div>
+      } @else {
+        <div class="bag-items">
+          @for (item of cart.items(); track item.id) {
+            <div class="bag-item">
+              <img [src]="item.image" [alt]="item.name" />
+              <div class="bi-info">
+                <span class="bi-name">{{ item.name }}</span>
+                <span class="bi-price">৳{{ item.price | number }}</span>
+                <div class="bi-qty">
+                  <button (click)="cart.setQty(item.id, item.qty - 1)">−</button>
+                  <span>{{ item.qty }}</span>
+                  <button (click)="cart.setQty(item.id, item.qty + 1)">+</button>
+                </div>
+                <button class="bi-remove" (click)="cart.remove(item.id)">Remove</button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="drawer-foot">
+          @if (cart.couponCode()) {
+            <div class="coupon-applied">
+              <span>Coupon <strong>{{ cart.couponCode() }}</strong> applied — −৳{{ cart.couponDiscount() | number }}</span>
+              <button (click)="removeCoupon()">Remove</button>
+            </div>
+          } @else {
+            <div class="coupon-row">
+              <input placeholder="Coupon code" [value]="couponInput()" (input)="couponInput.set($any($event.target).value.toUpperCase())" />
+              <button [disabled]="couponBusy() || !couponInput()" (click)="applyCoupon()">
+                {{ couponBusy() ? '…' : 'Apply' }}
+              </button>
+            </div>
+            @if (cart.couponError()) { <p class="coupon-error">{{ cart.couponError() }}</p> }
+          }
+
+          <div class="sum-row"><span>Subtotal</span><strong>৳{{ cart.subtotal() | number }}</strong></div>
+          @if (cart.couponDiscount() > 0) {
+            <div class="sum-row discount"><span>Discount</span><strong>−৳{{ cart.couponDiscount() | number }}</strong></div>
+          }
+          <div class="sum-row"><span>Delivery</span><span class="muted">by location, at checkout</span></div>
+          <div class="sum-row total"><span>Total</span><strong>৳{{ cart.total() | number }} + delivery</strong></div>
+
+          <button class="primary-btn" (click)="goToCheckout()">Confirm order</button>
+        </div>
+      }
+    }
+
+    @if (step() === 'checkout') {
+      <div class="drawer-head">
+        <h2>Confirm your order</h2>
+        <button class="close-x" (click)="closeAll()" aria-label="Close">×</button>
+      </div>
+
+      <div class="checkout-body">
+        <p class="cod-note">No online payment needed. We'll call you to confirm your order before delivery — payment is on delivery.</p>
+
+        <form (submit)="$event.preventDefault(); placeOrder()">
+          <label>Full name
+            <input [value]="name()" (input)="name.set($any($event.target).value)" required />
+          </label>
+
+          <label>Phone number
+            <input [value]="phone()" (input)="phone.set($any($event.target).value)" required />
+          </label>
+          <p class="field-hint">11-digit Bangladesh mobile number, starting with 01</p>
+
+          <label>Delivery location
+            <select [value]="zoneName()" (change)="zoneName.set($any($event.target).value)">
+              @if (zones.zones().length === 0) {
+                <option value="" disabled selected>Loading delivery areas…</option>
+              }
+              @for (z of zones.zones(); track z.id) {
+                <option [value]="z.name">{{ z.name }} — ৳{{ z.charge }}</option>
+              }
+            </select>
+          </label>
+
+          <label>Delivery address
+            <textarea rows="3" [value]="addr()" (input)="addr.set($any($event.target).value)" required></textarea>
+          </label>
+
+          <label>Notes (optional)
+            <input placeholder="e.g. preferred delivery time, need official invoice" [value]="note()" (input)="note.set($any($event.target).value)" />
+          </label>
+
+          <div class="order-summary">
+            <div class="sum-row"><span>Subtotal</span><span>৳{{ cart.total() | number }}</span></div>
+            <div class="sum-row"><span>Delivery — {{ zoneName() }}</span><span>৳{{ selectedZoneCharge() | number }}</span></div>
+            <div class="sum-row total"><strong>Total (COD)</strong><strong>৳{{ checkoutTotal() | number }}</strong></div>
+          </div>
+
+          @if (checkoutError()) { <p class="error">{{ checkoutError() }}</p> }
+
+          <button class="primary-btn" type="submit" [disabled]="submitting() || !zoneName()">
+            {{ submitting() ? 'Placing order…' : 'Place order →' }}
+          </button>
+        </form>
+      </div>
+    }
+
+    @if (step() === 'placed' && placedOrder(); as o) {
+      <div class="drawer-head">
+        <h2>Order placed</h2>
+        <button class="close-x" (click)="closeAll()" aria-label="Close">×</button>
+      </div>
+
+      <div class="placed-body">
+        <div class="placed-icon">✓</div>
+        <p class="placed-code">Order <strong>#{{ o.id }}</strong></p>
+
+        <div class="order-summary">
+          <div class="sum-row"><span>Subtotal</span><span>৳{{ o.subtotal | number }}</span></div>
+          <div class="sum-row"><span>Delivery — {{ o.deliveryZone }}</span><span>৳{{ o.deliveryCharge | number }}</span></div>
+          <div class="sum-row total"><strong>Total (COD)</strong><strong>৳{{ o.total | number }}</strong></div>
+        </div>
+
+        <p class="confirm-note">We'll call <strong>{{ o.phone }}</strong> shortly to confirm — pay cash on delivery.</p>
+
+        <button class="primary-btn" [disabled]="invoiceGenerating()" (click)="downloadInvoice()">
+          {{ invoiceGenerating() ? 'Preparing PDF…' : '↓ Download invoice (PDF)' }}
+        </button>
+        <button class="secondary-btn" (click)="trackOrder()">Track my order</button>
+        <button class="link-btn" (click)="closeAll()">Continue shopping</button>
+      </div>
+    }
+
+  </div>
+}

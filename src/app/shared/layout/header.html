@@ -1,0 +1,94 @@
+<header>
+  <nav class="nav">
+    <button class="hamburger" (click)="toggleMobileMenu()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <a routerLink="/" class="brand" (click)="filterCat('All')">
+      <img src="assets/logo.png" alt="EONS" />
+    </a>
+
+    <div class="nav-links">
+      <a (click)="filterCat('All')" [class.active]="products.activeCat() === 'All'">All</a>
+      @for (c of cats.menu(); track c.name) {
+        @if (c.subs.length === 0) {
+          <a (click)="filterCat(c.name)" [class.active]="products.activeCat() === c.name">{{ c.name }}</a>
+        } @else {
+          <div class="nav-item" [class.open]="openDropdown() === c.name">
+            <div class="nav-row">
+              <a (click)="filterCat(c.name)" [class.active]="products.activeCat() === c.name && !products.activeSub()">{{ c.name }}</a>
+              <span class="nav-caret" (click)="toggleDropdown(c.name)">▾</span>
+            </div>
+            <div class="nav-dd">
+              <div class="nav-dd-card">
+                <a class="dd-all" (click)="filterCat(c.name)">All {{ c.name }}</a>
+                @for (s of c.subs; track s) {
+                  <a (click)="filterSub(c.name, s)" [class.active]="products.activeCat() === c.name && products.activeSub() === s">{{ s }}</a>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="nav-right">
+      <button class="search-btn" (click)="toggleSearch()" aria-label="Search products">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+      <button (click)="cart.open()" class="cart-btn" id="cart-fly-target" [class.bounce]="cart.bounceActive()" aria-label="Open cart">
+        <span class="bag-ico">🛒</span>
+        <span class="cart-label">Bag</span>
+        @if (cart.count() > 0) { <span class="cart-count">{{ cart.count() }}</span> }
+      </button>
+    </div>
+  </nav>
+
+  @if (searchOpen()) {
+    <div class="search-row open">
+      <div class="search-inner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input
+          placeholder="Search products, brands, categories…"
+          [value]="products.searchQuery()"
+          (input)="onSearchInput($any($event.target).value)"
+          (keydown.escape)="toggleSearch(false)"
+        />
+        <button class="search-clear" (click)="toggleSearch(false)" aria-label="Close search">×</button>
+      </div>
+    </div>
+  }
+
+  @if (mobileMenuOpen()) {
+    <div class="mobile-backdrop" (click)="closeMobileMenu()"></div>
+    <div class="mobile-menu">
+      <div class="mobile-menu-head">
+        <span class="serif">Menu</span>
+        <button (click)="closeMobileMenu()" aria-label="Close menu">×</button>
+      </div>
+
+      <a class="m-link" (click)="filterCat('All')" [class.active]="products.activeCat() === 'All'">All</a>
+
+      @for (c of cats.menu(); track c.name) {
+        @if (c.subs.length === 0) {
+          <a class="m-link" (click)="filterCat(c.name)" [class.active]="products.activeCat() === c.name">{{ c.name }}</a>
+        } @else {
+          <div class="m-group" [class.open]="mobileExpanded() === c.name">
+            <div class="m-group-head" (click)="toggleMobileExpand(c.name)">
+              <span [class.active]="products.activeCat() === c.name && !products.activeSub()">{{ c.name }}</span>
+              <span class="m-caret">▾</span>
+            </div>
+            @if (mobileExpanded() === c.name) {
+              <div class="m-subs">
+                <a class="m-sub-link" (click)="filterCat(c.name)">All {{ c.name }}</a>
+                @for (s of c.subs; track s) {
+                  <a class="m-sub-link" (click)="filterSub(c.name, s)" [class.active]="products.activeCat() === c.name && products.activeSub() === s">{{ s }}</a>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+</header>

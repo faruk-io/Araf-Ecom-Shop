@@ -1,0 +1,34 @@
+@if (cats.menu().length > 0) {
+  <div class="cat-tiles-wrap">
+    <div class="cat-tiles">
+      <div class="cat-tile" [class.on]="products.activeCat() === 'All'" (click)="pick('All')" role="button">
+        <div class="ct-img">
+          <div class="ct-ph">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+          </div>
+        </div>
+        <span>All</span>
+      </div>
+
+      @for (c of cats.menu(); track c.name) {
+        <div class="cat-tile" [class.on]="products.activeCat() === c.name" (click)="pick(c.name)" role="button">
+          <div class="ct-img">
+            @if (c.image) {
+              <img [src]="c.image" [alt]="c.name" loading="lazy" />
+            } @else if (hasIcon(c.name)) {
+              <div class="ct-ph">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" [innerHTML]="iconSvg(c.name)"></svg>
+              </div>
+            } @else {
+              <div class="ct-ph"><span class="ct-letter">{{ c.name.charAt(0).toUpperCase() }}</span></div>
+            }
+          </div>
+          <span>{{ c.name }}</span>
+        </div>
+      }
+    </div>
+  </div>
+}

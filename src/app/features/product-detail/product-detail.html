@@ -1,0 +1,34 @@
+@if (products.loading()) {
+  <p class="status">Loading…</p>
+} @else if (product(); as p) {
+  <section class="detail">
+    <img [src]="p.images[0]" [alt]="p.name" class="main-img" />
+    <div class="info">
+      <h2>{{ p.name }}</h2>
+      <p class="cat">{{ p.cat }} @if (p.sub) { · {{ p.sub }} }</p>
+      <div class="price-row">
+        <span class="price">৳{{ p.price | number }}</span>
+        @if (p.old > p.price) { <span class="old">৳{{ p.old | number }}</span> }
+      </div>
+      <p class="desc">{{ p.desc }}</p>
+
+      @if (p.stock <= 0) {
+        <span class="oos">Out of stock</span>
+      } @else {
+        <button [class.added]="justAdded()" (click)="addToCart($event)">{{ justAdded() ? '✓ Added to bag' : 'Add to cart' }}</button>
+      }
+
+      @if (p.reviews.length > 0) {
+        <h3>Reviews</h3>
+        @for (r of p.reviews; track r.id) {
+          <div class="review">
+            <strong>{{ r.name }}</strong> — {{ r.rating }}★
+            <p>{{ r.comment }}</p>
+          </div>
+        }
+      }
+    </div>
+  </section>
+} @else {
+  <p class="status">Product not found.</p>
+}

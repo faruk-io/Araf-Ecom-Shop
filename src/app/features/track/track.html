@@ -1,0 +1,74 @@
+<section class="track">
+  @if (!order()) {
+    <h2>Track your order</h2>
+    <div class="search-row">
+      <input
+        placeholder="e.g. EON100001"
+        [value]="code()"
+        (input)="code.set($any($event.target).value)"
+        (keyup.enter)="search()"
+      />
+      <button (click)="search()" [disabled]="loading()">{{ loading() ? '…' : 'Track' }}</button>
+    </div>
+
+    @if (notFound()) {
+      <p class="status error">No order found with that code — please check and try again.</p>
+    }
+  } @else {
+    <div class="receipt" [class]="'tone-' + banner().tone">
+      <div class="r-brand">
+        <span class="r-store">{{ store.info()?.store_name || 'EONS' }}</span>
+      </div>
+
+      <div class="r-head">
+        <div>
+          <div class="r-code">Order <strong>#{{ order()!.id }}</strong></div>
+          <div class="r-date">Placed {{ placedAtFormatted() }}</div>
+        </div>
+        <div class="r-total-block">
+          <div class="r-total">৳{{ order()!.total | number }}</div>
+          <div class="r-cod">Cash on Delivery</div>
+        </div>
+      </div>
+
+      <div class="r-banner">{{ banner().text }}</div>
+
+      <div class="stepper">
+        @for (label of ['Order confirmed', 'Out for delivery', 'Delivered']; track label; let i = $index) {
+          <div class="step" [class]="stepStates()[i]">
+            <div class="step-circle">{{ stepStates()[i] === 'done' ? '✓' : i + 1 }}</div>
+            <div class="step-label">{{ label }}</div>
+          </div>
+          @if (i < 2) { <div class="step-line" [class.done]="stepStates()[i] === 'done'"></div> }
+        }
+      </div>
+
+      @if (store.info()?.whatsapp && !store.info()!.whatsapp.includes('X')) {
+        <p class="r-help">
+          Need help? WhatsApp {{ store.info()!.whatsapp }}
+          @if (store.info()?.hours) { · {{ store.info()!.hours }} }
+        </p>
+      }
+
+      <div class="r-divider"></div>
+
+      <div class="r-section-title">Items</div>
+      <div class="r-items">
+        @for (item of order()!.items; track item.id) {
+          <div class="r-item">
+            <span>{{ item.name }} × {{ item.qty }}</span>
+            <span>৳{{ item.price * item.qty | number }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="r-sum-row"><span>Subtotal</span><span>৳{{ order()!.subtotal | number }}</span></div>
+      <div class="r-sum-row"><span>Delivery — {{ order()!.deliveryZone }}</span><span>৳{{ order()!.deliveryCharge | number }}</span></div>
+      @if (order()!.discount > 0) {
+        <div class="r-sum-row discount"><span>Discount</span><span>−৳{{ order()!.discount | number }}</span></div>
+      }
+
+      <a routerLink="/" class="continue-btn">← Continue shopping</a>
+    </div>
+  }
+</section>

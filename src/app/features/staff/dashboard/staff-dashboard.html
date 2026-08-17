@@ -1,0 +1,102 @@
+<section class="dash">
+  <div class="dash-head">
+    <h2>Orders</h2>
+    <div class="head-actions">
+      <a routerLink="/staff/products" class="products-link">Manage products</a>
+      <a routerLink="/staff/banners" class="products-link">Manage banners</a>
+      <button class="logout" (click)="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button [class.active]="tab() === 'all'" (click)="tab.set('all')">All ({{ counts().all }})</button>
+    <button [class.active]="tab() === 'pending'" (click)="tab.set('pending')">Pending ({{ counts().pending }})</button>
+    <button [class.active]="tab() === 'approved'" (click)="tab.set('approved')">Approved ({{ counts().approved }})</button>
+    <button [class.active]="tab() === 'cancelled'" (click)="tab.set('cancelled')">Cancelled ({{ counts().cancelled }})</button>
+  </div>
+
+  @if (loading()) {
+    <p class="status">Loading orders…</p>
+  } @else if (errorMsg()) {
+    <p class="status error">{{ errorMsg() }}</p>
+  } @else if (filtered().length === 0) {
+    <p class="status">No orders here.</p>
+  } @else {
+    <div class="order-list">
+      @for (o of filtered(); track o.id) {
+        <div class="order-card" [class.busy]="busyCode() === o.id">
+          <div class="order-top">
+            <div>
+              <strong class="code">{{ o.id }}</strong>
+              <span class="badge" [class]="o.status">{{ o.status }}</span>
+              @if (o.delivery) { <span class="badge delivery">{{ o.delivery }}</span> }
+              @if (o.settled) { <span class="badge settled">Settled — {{ o.settledOutcome }}</span> }
+            </div>
+            <strong class="total">৳{{ o.total | number }}</strong>
+          </div>
+
+          <div class="order-body">
+            <p><strong>{{ o.name }}</strong> · {{ o.phone }}</p>
+            <p class="addr">{{ o.addr }} — {{ o.deliveryZone }} (৳{{ o.deliveryCharge }})</p>
+            <ul class="items">
+              @for (item of o.items; track item.id) {
+                <li>{{ item.qty }} × {{ item.name }} — ৳{{ item.price * item.qty | number }}</li>
+              }
+            </ul>
+            @if (o.riderName) {
+              <p class="rider-info">🏍 {{ o.riderName }} · {{ o.riderPhone }}</p>
+            }
+          </div>
+
+          <div class="order-actions">
+            @if (o.status === 'pending') {
+              <button class="btn primary" [disabled]="busyCode() === o.id" (click)="approve(o)">Approve</button>
+              <button class="btn danger" [disabled]="busyCode() === o.id" (click)="cancel(o)">Cancel</button>
+            }
+
+            @if (o.status === 'approved') {
+              <select
+                class="delivery-select"
+                [value]="o.delivery || ''"
+                [disabled]="busyCode() === o.id"
+                (change)="setDelivery(o, $any($event.target).value)"
+              >
+                <option value="" disabled>Set delivery status…</option>
+                @for (s of deliveryStates; track s) { <option [value]="s">{{ s }}</option> }
+              </select>
+
+              @if (riderFormFor() === o.id) {
+                <span class="rider-form">
+                  <input placeholder="Rider name" [value]="riderName()" (input)="riderName.set($any($event.target).value)" />
+                  <input placeholder="Rider phone" [value]="riderPhone()" (input)="riderPhone.set($any($event.target).value)" />
+                  <button class="btn small" (click)="saveRider(o)">Save</button>
+                  <button class="btn small ghost" (click)="closeRiderForm()">Cancel</button>
+                </span>
+              } @else {
+                <button class="btn" [disabled]="busyCode() === o.id" (click)="openRiderForm(o)">
+                  {{ o.riderName ? 'Change rider' : 'Assign rider' }}
+                </button>
+                @if (o.riderName) {
+                  <button class="btn ghost" [disabled]="busyCode() === o.id" (click)="clearRider(o)">Clear rider</button>
+                }
+              }
+
+              <button class="btn danger" [disabled]="busyCode() === o.id" (click)="cancel(o)">Cancel order</button>
+            }
+
+            @if (o.status === 'cancelled') {
+              <button class="btn" [disabled]="busyCode() === o.id" (click)="reopen(o)">Reopen</button>
+            }
+
+            @if (canSettle(o)) {
+              <button class="btn primary" [disabled]="busyCode() === o.id" (click)="settle(o)">Mark settled (cash collected)</button>
+            }
+            @if (o.settled) {
+              <button class="btn ghost" [disabled]="busyCode() === o.id" (click)="reopenSettled(o)">Reopen settlement</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

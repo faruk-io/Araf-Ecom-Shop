@@ -1,0 +1,76 @@
+<section class="banners-page">
+  <div class="page-head">
+    <h2>Hero banners</h2>
+    <div class="head-actions">
+      <a routerLink="/staff/dashboard" class="btn">← Orders</a>
+      <a routerLink="/staff/products" class="btn">Products</a>
+      <button class="btn primary" (click)="openNew()">+ Add banner</button>
+    </div>
+  </div>
+  <p class="hint">
+    When at least one banner is active, it replaces the plain hero text on the homepage with this
+    slider. The "Shop Now" button on each slide jumps straight to the category you pick below.
+  </p>
+
+  @if (!editing()) {
+    <div class="list">
+      @for (b of banners.staffBanners(); track b.id; let i = $index) {
+        <div class="row" [class.inactive]="!b.active">
+          <img class="thumb" [src]="b.image" alt="" />
+          <div class="info">
+            <strong>{{ b.title || '(no title)' }}</strong>
+            <span class="meta">{{ b.active ? 'Active' : 'Hidden' }} @if (b.ctaCat) { · Shop Now → {{ b.ctaCat }} }</span>
+          </div>
+          <div class="row-actions">
+            <button class="btn small" [disabled]="i === 0" (click)="move(b, -1)">↑</button>
+            <button class="btn small" [disabled]="i === banners.staffBanners().length - 1" (click)="move(b, 1)">↓</button>
+            <button class="btn small" (click)="toggle(b)">{{ b.active ? 'Hide' : 'Show' }}</button>
+            <button class="btn small" (click)="openEdit(b)">Edit</button>
+            <button class="btn small danger" (click)="remove(b)">Delete</button>
+          </div>
+        </div>
+      }
+      @if (banners.staffBanners().length === 0) {
+        <p class="status">No banners yet — the homepage is showing the plain hero text.</p>
+      }
+    </div>
+  } @else {
+    <div class="editor">
+      <h3>{{ editing()!.id ? 'Edit banner' : 'Add banner' }}</h3>
+      @if (errorMsg()) { <p class="error">{{ errorMsg() }}</p> }
+
+      <label class="image-label">
+        Banner image (wide, e.g. 1600×600)
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+      </label>
+      @if (uploading()) { <p class="uploading">Uploading…</p> }
+      @if (editing()!.image) { <img class="preview" [src]="editing()!.image" alt="" /> }
+
+      <label>Title <input [value]="editing()!.title" (input)="editing()!.title = $any($event.target).value" /></label>
+      <label>Subtitle <input [value]="editing()!.subtitle" (input)="editing()!.subtitle = $any($event.target).value" /></label>
+
+      <div class="two-col">
+        <label>Button text <input placeholder="Shop Now" [value]="editing()!.ctaText" (input)="editing()!.ctaText = $any($event.target).value" /></label>
+        <label>
+          Button links to
+          <select [value]="editing()!.ctaCat" (change)="editing()!.ctaCat = $any($event.target).value">
+            <option value="">(scroll to shop section)</option>
+            @for (c of cats.menu(); track c.name) { <option [value]="c.name">{{ c.name }}</option> }
+          </select>
+        </label>
+      </div>
+
+      <label class="active-toggle">
+        <input type="checkbox" [checked]="editing()!.active" (change)="editing()!.active = $any($event.target).checked" />
+        Active (visible on the homepage)
+      </label>
+
+      <div class="editor-actions">
+        <button class="btn primary" [disabled]="saving() || uploading()" (click)="save()">
+          {{ saving() ? 'Saving…' : 'Save banner' }}
+        </button>
+        <button class="btn" (click)="close()">Cancel</button>
+      </div>
+    </div>
+  }
+</section>

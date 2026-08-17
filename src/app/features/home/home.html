@@ -1,0 +1,61 @@
+<app-hero />
+<app-category-tiles />
+
+<section id="shop-top">
+  <div class="sec-head">
+    <div>
+      <h2>
+        {{ products.activeSub() || products.activeCat() === 'All' ? 'Shop' : products.activeCat() }}
+        {{ products.activeSub() ? ' — ' + products.activeSub() : '' }}
+      </h2>
+      @if (products.searchQuery()) {
+        <p>{{ products.visibleProducts().length }} results for "{{ products.searchQuery() }}"</p>
+      } @else {
+        <p>Genuine products, fair prices, delivered across Bangladesh.</p>
+      }
+    </div>
+  </div>
+
+  @if (products.loading()) {
+    <p class="status">Loading products…</p>
+  } @else if (products.error()) {
+    <div class="empty">
+      <h3 class="serif">Can't load the store</h3>
+      <p>{{ products.error() }}</p>
+    </div>
+  } @else if (products.visibleProducts().length === 0) {
+    <div class="empty"><p>No products match here yet.</p></div>
+  } @else {
+    <div class="grid">
+      @for (p of products.visibleProducts(); track p.id) {
+        <a class="card" [routerLink]="['/product', p.id]">
+          <div class="card-img">
+            @if (p.stock <= 0) {
+              <span class="tag low">Out of stock</span>
+            } @else if (p.old > p.price) {
+              <span class="tag">Sale</span>
+            }
+            <img [src]="p.images[0]" [alt]="p.name" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-cat">{{ p.cat }}</div>
+            <div class="card-name">{{ p.name }}</div>
+            <div class="card-foot">
+              <div class="price">
+                ৳{{ p.price | number }}
+                @if (p.old > p.price) { <small>৳{{ p.old | number }}</small> }
+              </div>
+              @if (p.stock > 0) {
+                <button
+                  class="add-btn"
+                  [class.added]="justAdded().has(p.id)"
+                  (click)="addToCart(p.id, $event)"
+                >{{ justAdded().has(p.id) ? '✓ Added' : 'Add' }}</button>
+              }
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</section>

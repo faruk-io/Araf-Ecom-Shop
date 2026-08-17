@@ -1,0 +1,134 @@
+.drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(24, 31, 59, .4);
+  z-index: 90; animation: fadeIn .18s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 92vw;
+  background: var(--bg); z-index: 91; overflow-y: auto;
+  box-shadow: -8px 0 28px rgba(24, 31, 59, .18);
+  animation: slideIn .22s ease;
+  display: flex; flex-direction: column;
+  transition: none; // no implicit tween between right-drawer and centered-modal positions — instant switch, only the animation below plays
+
+  // Checkout step renders as a centered modal card instead of a
+  // full-height right-side panel — per your request, only this step.
+  &.centered {
+    top: 50%; right: auto; left: 50%; bottom: auto;
+      width: 520px; 
+    max-height: 88vh;
+    transform: translate(-50%, -50%);
+    border-radius: var(--r);
+    box-shadow: 0 20px 60px rgba(24, 31, 59, .28);
+    animation: popIn .2s ease;
+  }
+}
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.drawer-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 24px 18px; border-bottom: 1px solid var(--line);
+  h2 { font-family: "Space Grotesk", sans-serif; font-size: 1.5rem; font-weight: 600; }
+  .close-x { font-size: 1.6rem; line-height: 1; color: var(--ink-soft); padding: 4px; &:hover { color: var(--ink); } }
+}
+
+/* ---------- bag step ---------- */
+.empty-bag { padding: 60px 24px; text-align: center; color: var(--ink-soft); }
+.link-btn { color: var(--blue-deep); text-decoration: underline; font-size: .88rem; margin-top: 8px; }
+
+.bag-items { flex: 1; padding: 18px 24px; display: flex; flex-direction: column; gap: 18px; }
+.bag-item {
+  display: flex; gap: 14px;
+  img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+}
+.bi-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.bi-name { font-size: .92rem; font-weight: 500; }
+.bi-price { font-family: "IBM Plex Mono", monospace; color: var(--blue-deep); font-size: .9rem; }
+.bi-qty {
+  display: inline-flex; align-items: center; gap: 10px; margin-top: 2px;
+  button {
+    width: 26px; height: 26px; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--card); font-size: .95rem; line-height: 1;
+  }
+  span { min-width: 16px; text-align: center; font-size: .9rem; }
+}
+.bi-remove { align-self: flex-start; font-size: .78rem; color: var(--ink-soft); text-decoration: underline; margin-top: 2px; }
+
+.drawer-foot { border-top: 1px solid var(--line); padding: 18px 24px 24px; }
+
+.coupon-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.coupon-row input {
+  flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+  font-size: .85rem; text-transform: uppercase; background: var(--card);
+}
+.coupon-row button {
+  padding: 10px 16px; background: var(--blue-deep); color: #fff; border-radius: 8px; font-size: .85rem; font-weight: 600;
+  &:disabled { opacity: .5; }
+}
+.coupon-error { color: #a14b46; font-size: .78rem; margin: -8px 0 12px; }
+.coupon-applied {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #eaf6ee; color: #1e5c2f; padding: 10px 12px; border-radius: 8px;
+  font-size: .82rem; margin-bottom: 14px;
+  button { text-decoration: underline; font-weight: 600; }
+}
+
+.sum-row {
+  display: flex; justify-content: space-between; padding: 6px 0; font-size: .88rem; color: var(--ink);
+  .muted { color: var(--ink-soft); font-size: .82rem; }
+  &.discount { color: #1e5c2f; }
+  &.total { padding-top: 12px; margin-top: 6px; border-top: 1px solid var(--line); font-size: 1.05rem; font-weight: 600; }
+}
+
+.primary-btn {
+  width: 100%; padding: 15px; background: var(--ink); color: #fff; border-radius: 40px;
+  font-size: .92rem; font-weight: 600; margin-top: 16px; transition: .2s;
+  &:hover { background: var(--blue-deep); }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+.secondary-btn {
+  width: 100%; padding: 14px; background: none; color: var(--blue-deep); border: 1px solid var(--line);
+  border-radius: 40px; font-size: .9rem; font-weight: 600; margin-top: 10px;
+  &:hover { border-color: var(--blue); }
+}
+
+/* ---------- checkout step ---------- */
+.checkout-body { padding: 20px 24px 28px; flex: 1; }
+.cod-note { font-size: .85rem; color: var(--ink-soft); margin-bottom: 20px; line-height: 1.6; }
+
+form { display: flex; flex-direction: column; }
+label { display: block; font-size: .8rem; color: var(--ink-soft); margin: 14px 0 6px; }
+input, textarea, select {
+  width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;
+  font-family: inherit; font-size: .9rem; background: var(--card); color: var(--ink);
+}
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--blue); }
+.field-hint { font-size: .74rem; color: var(--ink-soft); margin: -2px 0 0; }
+
+.order-summary {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; margin-top: 20px;
+}
+.error { color: #a14b46; font-size: .85rem; margin-top: 10px; }
+
+/* ---------- placed step ---------- */
+.placed-body { padding: 26px 24px 30px; text-align: center; }
+.placed-icon {
+  width: 52px; height: 52px; margin: 0 auto 14px; background: #1e7d4f; color: #fff;
+  border-radius: 50%; display: grid; place-items: center; font-size: 1.5rem;
+}
+.placed-code { color: var(--ink-soft); font-size: .92rem; margin-bottom: 18px; strong { color: var(--ink); font-family: "IBM Plex Mono", monospace; } }
+.confirm-note {
+  background: #eaf6ee; color: #1e5c2f; padding: 12px 14px; border-radius: 10px;
+  font-size: .84rem; margin: 18px 0; line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .drawer { width: 100vw; max-width: 100vw; }
+  .drawer.centered { width: 92vw; max-width: 92vw; }
+}

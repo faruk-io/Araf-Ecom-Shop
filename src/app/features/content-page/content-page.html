@@ -1,0 +1,12 @@
+<section class="page-view">
+  <h2 class="serif">{{ title() }}</h2>
+  @if (loading()) {
+    <p class="status">Loading…</p>
+  } @else if (paragraphs().length === 0) {
+    <p class="page-empty">This page hasn't been written yet. Please check back soon, or contact us with any questions.</p>
+  } @else {
+    @for (p of paragraphs(); track $index) {
+      <p>{{ p }}</p>
+    }
+  }
+</section>

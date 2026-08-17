@@ -1,0 +1,32 @@
+@if (hasBanners()) {
+  <div class="slider" (mouseenter)="stop()" (mouseleave)="start()">
+    @for (b of banners.banners(); track b.id; let i = $index) {
+      <div class="slide" [class.on]="i === slideIdx()">
+        <img [src]="b.image" [alt]="b.title || 'Banner'" [attr.loading]="i ? 'lazy' : null" />
+        @if (b.title || b.subtitle || b.ctaText) {
+          <div class="slide-text">
+            @if (b.title) { <h2>{{ b.title }}</h2> }
+            @if (b.subtitle) { <p>{{ b.subtitle }}</p> }
+            @if (b.ctaText) { <a class="slide-cta" (click)="cta(b)">{{ b.ctaText }}</a> }
+          </div>
+        }
+      </div>
+    }
+    @if (banners.banners().length > 1) {
+      <button class="slider-arrow prev" (click)="step(-1)" aria-label="Previous">‹</button>
+      <button class="slider-arrow next" (click)="step(1)" aria-label="Next">›</button>
+      <div class="slider-dots">
+        @for (b of banners.banners(); track b.id; let i = $index) {
+          <button [class.on]="i === slideIdx()" (click)="goSlide(i); start()" [attr.aria-label]="'Banner ' + (i+1)"></button>
+        }
+      </div>
+    }
+  </div>
+} @else {
+  <div class="static-hero">
+    <div class="hero-text">
+      <h1 class="serif">{{ store.info()?.hero_title || 'Genuine products, zero guesswork.' }}</h1>
+      <p>{{ store.info()?.hero_sub || store.info()?.tagline }}</p>
+    </div>
+  </div>
+}

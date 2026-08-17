@@ -1,0 +1,83 @@
+<section class="products-page">
+  <div class="page-head">
+    <h2>Products</h2>
+    <div class="head-actions">
+      <a routerLink="/staff/dashboard" class="btn">← Orders</a>
+      <a routerLink="/staff/banners" class="btn">Banners</a>
+      <button class="btn" (click)="logout()">Sign out</button>
+      <button class="btn primary" (click)="openNew()">+ Add product</button>
+    </div>
+  </div>
+
+  @if (!editing()) {
+    <input class="search-box" placeholder="Search products…" [value]="search()" (input)="search.set($any($event.target).value)" />
+
+    @if (products.loading()) {
+      <p class="status">Loading…</p>
+    } @else {
+      <div class="list">
+        @for (p of filteredList(); track p.id) {
+          <div class="row">
+            <img class="thumb" [src]="p.images[0]" [alt]="p.name" />
+            <div class="info">
+              <strong>{{ p.name }}</strong>
+              <span class="meta">{{ p.cat }} @if (p.sub) { · {{ p.sub }} } · ৳{{ p.price | number }}</span>
+            </div>
+            <label class="stock-field">
+              Stock
+              <input type="number" min="0" [value]="p.stock" (change)="quickStock(p, $any($event.target).value)" />
+            </label>
+            <div class="row-actions">
+              <button class="btn small" (click)="openEdit(p)">Edit</button>
+              <button class="btn small danger" (click)="deleteProduct(p)">Delete</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="editor">
+      <h3>{{ editing()!.id ? 'Edit product' : 'Add product' }}</h3>
+
+      @if (errorMsg()) { <p class="error">{{ errorMsg() }}</p> }
+
+      <label>Name <input [value]="editing()!.name" (input)="editing()!.name = $any($event.target).value" /></label>
+
+      <div class="two-col">
+        <label>Category <input [value]="editing()!.cat" (input)="editing()!.cat = $any($event.target).value" /></label>
+        <label>Subcategory <input [value]="editing()!.sub" (input)="editing()!.sub = $any($event.target).value" /></label>
+      </div>
+
+      <label>Description <textarea rows="3" [value]="editing()!.desc" (input)="editing()!.desc = $any($event.target).value"></textarea></label>
+
+      <div class="three-col">
+        <label>Price (৳) <input type="number" min="0" [value]="editing()!.price" (input)="editing()!.price = +$any($event.target).value" /></label>
+        <label>Old price (৳) <input type="number" min="0" [value]="editing()!.old" (input)="editing()!.old = +$any($event.target).value" /></label>
+        <label>Stock <input type="number" min="0" [value]="editing()!.stock" (input)="editing()!.stock = +$any($event.target).value" /></label>
+      </div>
+
+      <label class="images-label">
+        Images
+        <input type="file" accept="image/*" multiple (change)="onFilesSelected($event)" />
+      </label>
+
+      @if (uploadingCount() > 0) { <p class="uploading">Uploading {{ uploadingCount() }} image(s)…</p> }
+
+      <div class="image-strip">
+        @for (url of editingImages(); track url) {
+          <div class="image-chip">
+            <img [src]="url" alt="" />
+            <button (click)="removeImage(url)" aria-label="Remove image">×</button>
+          </div>
+        }
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn primary" [disabled]="saving() || uploadingCount() > 0" (click)="save()">
+          {{ saving() ? 'Saving…' : 'Save product' }}
+        </button>
+        <button class="btn" (click)="closeEditor()">Cancel</button>
+      </div>
+    </div>
+  }
+</section>
